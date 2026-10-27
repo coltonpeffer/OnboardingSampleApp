@@ -65,6 +65,9 @@ app.get('/api/tenants/:customerId', (req, res) => {
   res.json(tenant);
 });
 
+// Data mapping (Lane C)
+app.use('/api/mappings', require('./routes/mapping'));
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Onboarding API server running at http://localhost:${PORT}`);
