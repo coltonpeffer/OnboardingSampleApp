@@ -439,3 +439,86 @@ select:disabled {
   .content { padding: 16px; }
   .tab { padding: 10px 14px; }
 }
+
+/* Dashboard: customer by customer */
+.queue-layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 320px) 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+button.customer-card {
+  font: inherit;
+  text-align: left;
+  background: var(--surface);
+  color: inherit;
+  cursor: pointer;
+  margin-bottom: 0;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+button.customer-card:hover {
+  border-color: var(--primary);
+}
+
+button.customer-card.selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-soft);
+  background: var(--primary-soft);
+}
+
+button.customer-card .progress-bar-container {
+  height: 10px;
+  margin: 10px 0 0;
+}
+
+button.customer-card .progress-bar {
+  font-size: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.customer-detail {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+.customer-detail h3 {
+  font-size: 1.2rem;
+  margin-bottom: 6px;
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  margin: 16px 0 4px;
+}
+
+.facts dt {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.facts dd {
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--faint);
+  font-weight: 400;
+}
+
+@media (max-width: 800px) {
+  .queue-layout { grid-template-columns: 1fr; }
+}

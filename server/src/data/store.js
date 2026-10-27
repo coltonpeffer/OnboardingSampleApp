@@ -50,6 +50,20 @@ function seedData() {
   store.customers.push(exampleCustomer);
   store.tenants.push(exampleTenant);
   store.onboardingStates.push(exampleOnboardingState);
+
+  // Customers waiting in the queue, each linked to its sample data (see sample-data/)
+  const queued = [
+    { id: 'cust_002', name: 'ABC Accounting', industry: 'Accounting', region: 'North America',
+      contactEmail: 'onboarding@abc-accounting.example.com', sourceId: 'customer-a' },
+    { id: 'cust_003', name: 'XYZ Financial Services', industry: 'Financial Services', region: 'North America',
+      contactEmail: 'onboarding@xyz-financial.example.com', sourceId: 'customer-b' },
+    { id: 'cust_004', name: 'Premier Bookkeeping', industry: 'Bookkeeping', region: 'United Kingdom',
+      contactEmail: 'onboarding@premier-bookkeeping.example.com', sourceId: 'customer-c' }
+  ];
+  for (const data of queued) {
+    store.customers.push(createCustomer({ ...data, createdAt: '2025-01-20T10:00:00Z' }));
+    store.onboardingStates.push({ customerId: data.id, steps: createDefaultOnboardingSteps(), progressPercent: 0 });
+  }
 }
 
 // Initialize with seed data

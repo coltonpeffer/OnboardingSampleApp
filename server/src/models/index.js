@@ -9,6 +9,7 @@
  * @property {string} industry - Industry vertical
  * @property {string} region - Geographic region
  * @property {string} contactEmail - Primary contact email
+ * @property {string|null} sourceId - Sample-data mapping source this customer's files come from
  * @property {string} createdAt - ISO timestamp
  */
 
@@ -48,6 +49,7 @@ function createCustomer(data) {
     industry: data.industry || '',
     region: data.region || '',
     contactEmail: data.contactEmail || '',
+    sourceId: data.sourceId || null,
     createdAt: data.createdAt || new Date().toISOString()
   };
 }

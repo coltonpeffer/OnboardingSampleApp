@@ -49,7 +49,9 @@ app.get('/api/onboarding', (req, res) => {
       ...state,
       customerName: customer?.name || 'Unknown',
       customerIndustry: customer?.industry || '',
-      customerRegion: customer?.region || ''
+      customerRegion: customer?.region || '',
+      customerEmail: customer?.contactEmail || '',
+      sourceId: customer?.sourceId || null
     };
   });
   

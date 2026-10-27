@@ -21,12 +21,24 @@ test.describe('Onboarding Dashboard', () => {
     await expect(page.getByRole('button', { name: 'Import' })).toBeVisible();
   });
 
-  test('should display example customer in onboarding queue', async ({ page }) => {
+  test('should list every customer in the onboarding queue', async ({ page }) => {
     await page.goto('/');
 
-    // Wait for data to load and verify example customer is shown
-    await expect(page.locator('.customer-card')).toBeVisible();
-    await expect(page.locator('.customer-card h3')).toContainText('Acme Corporation');
+    // Wait for data to load and verify all customers are shown
+    await expect(page.locator('.customer-card')).toHaveCount(4);
+    await expect(page.locator('.customer-card h3').first()).toContainText('Acme Corporation');
+  });
+
+  test('should show one customer at a time', async ({ page }) => {
+    await page.goto('/');
+
+    // First customer is selected by default
+    await expect(page.getByTestId('customer-detail')).toContainText('Acme Corporation');
+
+    await page.locator('.customer-card', { hasText: 'XYZ Financial Services' }).click();
+    await expect(page.getByTestId('customer-detail')).toContainText('XYZ Financial Services');
+    await expect(page.getByTestId('customer-detail')).not.toContainText('Acme Corporation');
+    await expect(page.getByTestId('customer-detail')).toContainText('not created');
   });
 
   test('should switch between tabs', async ({ page }) => {

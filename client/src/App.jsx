@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import Dashboard from './tabs/Dashboard';
 import CustomerInfo from './tabs/CustomerInfo';
 import TenantSetup from './tabs/TenantSetup';
 import Import from './tabs/Import';
@@ -14,31 +15,6 @@ const TABS = [
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [onboardingData, setOnboardingData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    fetch('/api/onboarding')
-      .then(async (res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        if (!Array.isArray(data)) throw new Error('Invalid response format');
-        return data;
-      })
-      .then(data => {
-        setOnboardingData(data);
-        setError(null);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('Failed to fetch onboarding data:', err);
-        setError(err.message);
-        setOnboardingData([]);
-        setLoading(false);
-      });
-  }, []);
-
   return (
     <div className="app">
       <header>
@@ -59,9 +35,7 @@ function App() {
       </nav>
 
       <main className="content">
-        {activeTab === 'dashboard' && (
-          <DashboardTab data={onboardingData} loading={loading} error={error} />
-        )}
+        {activeTab === 'dashboard' && <Dashboard />}
         {activeTab === 'customer-info' && (
           <CustomerInfo />
         )}
@@ -76,77 +50,6 @@ function App() {
         )}
       </main>
     </div>
-  );
-}
-
-function DashboardTab({ data, loading, error }) {
-  if (loading) {
-    return <div className="placeholder"><p>Loading...</p></div>;
-  }
-
-  if (error) {
-    return (
-      <div className="alert alert-error" role="alert">⚠️ Failed to load onboarding data: {error}</div>
-    );
-  }
-
-  if (data.length === 0) {
-    return <div className="placeholder"><p>No customers in the onboarding queue</p></div>;
-  }
-
-  return (
-    <div>
-      <h2>Onboarding Queue</h2>
-      <p className="lead">
-        {data.length} customer(s) awaiting onboarding
-      </p>
-
-      {data.map(item => (
-        <div key={item.customerId} className="customer-card">
-          <h3>{item.customerName}</h3>
-          <div className="customer-meta">
-            <span>📍 {item.customerRegion}</span>
-            <span>🏭 {item.customerIndustry}</span>
-          </div>
-
-          <div className="progress-section">
-            <ProgressBar percent={item.progressPercent} />
-            <Checklist steps={item.steps} />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ProgressBar({ percent }) {
-  return (
-    <div className="progress-bar-container">
-      <div 
-        className="progress-bar" 
-        style={{ width: `${Math.max(percent, 0)}%` }}
-      >
-        {percent > 0 ? `${percent}%` : ''}
-      </div>
-    </div>
-  );
-}
-
-function Checklist({ steps }) {
-  return (
-    <ul className="checklist">
-      {steps.map(step => (
-        <li key={step.id}>
-          <span className={`step-status ${step.status}`}>
-            {step.status === 'completed' ? '✓' : step.order}
-          </span>
-          <span>{step.name}</span>
-          <span style={{ marginLeft: 'auto', fontSize: '0.85rem', color: '#9ca3af' }}>
-            {step.status.replace('_', ' ')}
-          </span>
-        </li>
-      ))}
-    </ul>
   );
 }
 
