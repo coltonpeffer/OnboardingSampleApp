@@ -36,35 +36,38 @@ function CustomerInfo() {
   return (
     <div>
       <h2>Customer Info · Clients</h2>
-      <p style={{ color: '#6b7280', marginBottom: '16px' }}>
+      <p className="lead">
         Validate the customer's clients file before mapping and import.
       </p>
 
-      <label>
-        Customer:{' '}
-        <select value={sourceId} onChange={e => setSourceId(e.target.value)}>
-          {sources.map(src => <option key={src.id} value={src.id}>{src.name}</option>)}
-        </select>
-      </label>
+      <div className="toolbar">
+        <label>
+          Customer
+          <select value={sourceId} onChange={e => setSourceId(e.target.value)}>
+            {sources.map(src => <option key={src.id} value={src.id}>{src.name}</option>)}
+          </select>
+        </label>
+      </div>
 
-      {error && <p role="alert" style={{ color: '#dc2626', marginTop: '12px' }}>⚠️ {error}</p>}
+      {error && <p role="alert" className="alert alert-error">⚠️ {error}</p>}
       {!validation && !error && <p>Loading...</p>}
 
       {validation && (
         <>
-          <p data-testid="validation-summary" style={{ margin: '16px 0 8px' }}>
-            {s.total} rows: <strong>{s.clean} clean</strong>,{' '}
-            <span style={{ color: s.withWarnings ? '#d97706' : undefined }}>{s.withWarnings} with warnings</span>,{' '}
-            <span style={{ color: s.withErrors ? '#dc2626' : undefined }}>{s.withErrors} with errors</span>
+          <p data-testid="validation-summary" className="summary">
+            <span>{s.total} rows:</span>
+            <span className="badge badge-ok">{s.clean} clean</span>
+            <span className={`badge ${s.withWarnings ? 'badge-warn' : ''}`}>{s.withWarnings} with warnings</span>
+            <span className={`badge ${s.withErrors ? 'badge-error' : ''}`}>{s.withErrors} with errors</span>
           </p>
           {validation.missingColumns.length > 0 && (
-            <p role="alert" style={{ color: '#dc2626' }}>
+            <p role="alert" className="alert alert-error">
               Missing columns: {validation.missingColumns.join(', ')}
             </p>
           )}
 
-          <div className="mapping-scroll">
-            <table className="mapping-table" data-testid="validation-rows">
+          <div className="table-scroll">
+            <table className="data-table" data-testid="validation-rows">
               <thead>
                 <tr>
                   <th>Line</th>
@@ -79,7 +82,7 @@ function CustomerInfo() {
                     {validation.fields.map(f => <td key={f.key}>{row.source[f.column] || '—'}</td>)}
                     <td>
                       {row.issues.map((i, n) => (
-                        <div key={n} style={{ color: i.severity === 'error' ? '#dc2626' : '#d97706' }}>
+                        <div key={n} className={i.severity === 'error' ? 'issue-error' : 'issue-warning'}>
                           {i.severity === 'error' ? '✖' : '⚠'} {i.message}
                         </div>
                       ))}

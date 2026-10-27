@@ -86,10 +86,7 @@ function DashboardTab({ data, loading, error }) {
 
   if (error) {
     return (
-      <div className="placeholder">
-        <p style={{ color: '#dc2626' }}>⚠️ Failed to load onboarding data</p>
-        <p style={{ fontSize: '0.85rem', color: '#6b7280' }}>{error}</p>
-      </div>
+      <div className="alert alert-error" role="alert">⚠️ Failed to load onboarding data: {error}</div>
     );
   }
 
@@ -100,7 +97,7 @@ function DashboardTab({ data, loading, error }) {
   return (
     <div>
       <h2>Onboarding Queue</h2>
-      <p style={{ color: '#6b7280', marginBottom: '20px' }}>
+      <p className="lead">
         {data.length} customer(s) awaiting onboarding
       </p>
 

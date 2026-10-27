@@ -49,35 +49,39 @@ function Import() {
   return (
     <div>
       <h2>Import · Clients</h2>
-      <p style={{ color: '#6b7280', marginBottom: '16px' }}>
+      <p className="lead">
         Import a customer's mapped clients into the platform. Safe to re-run.
       </p>
 
-      <label>
-        Customer:{' '}
-        <select value={sourceId} onChange={e => setSourceId(e.target.value)}>
-          {sources.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-        </select>
-      </label>{' '}
-      <button onClick={runImport} disabled={busy || !sourceId}>Import clients</button>
+      <div className="toolbar">
+        <label>
+          Customer
+          <select value={sourceId} onChange={e => setSourceId(e.target.value)}>
+            {sources.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+          </select>
+        </label>
+        <button className="btn btn-primary" onClick={runImport} disabled={busy || !sourceId}>
+          {busy ? 'Importing…' : 'Import clients'}
+        </button>
+      </div>
 
-      {error && <p role="alert" style={{ color: '#dc2626', marginTop: '12px' }}>⚠️ {error}</p>}
+      {error && <p role="alert" className="alert alert-error">⚠️ {error}</p>}
 
       {result && (
-        <p data-testid="import-summary" style={{ marginTop: '12px' }}>
+        <p data-testid="import-summary" className={`alert ${result.skipped.length ? 'alert-error' : 'alert-success'}`}>
           {result.imported} imported, {result.updated} updated, {result.skipped.length} skipped (of {result.total})
         </p>
       )}
       {result?.skipped.map(s => (
-        <p key={s.externalId} style={{ color: '#dc2626', fontSize: '0.85rem' }}>
+        <p key={s.externalId} className="issue-error" style={{ fontSize: '0.85rem', marginTop: '4px' }}>
           {s.externalId}: {s.issues.map(i => i.message).join('; ')}
         </p>
       ))}
 
-      <h3 className="mapping-heading">Imported clients ({clients.length})</h3>
+      <h3 className="section-heading">Imported clients ({clients.length})</h3>
       {clients.length === 0 ? <p>Nothing imported yet.</p> : (
-        <div className="mapping-scroll">
-          <table className="mapping-table" data-testid="imported-clients">
+        <div className="table-scroll">
+          <table className="data-table" data-testid="imported-clients">
             <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Status</th><th>Start</th><th>Industry</th></tr></thead>
             <tbody>
               {clients.map(c => (

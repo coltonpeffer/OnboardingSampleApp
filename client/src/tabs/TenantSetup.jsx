@@ -74,23 +74,26 @@ function TenantSetup() {
   return (
     <div>
       <h2>Tenant Setup</h2>
-      <p style={{ color: '#6b7280', marginBottom: '16px' }}>
+      <p className="lead">
         Configure and provision the customer's platform tenant.
       </p>
 
-      <label>
-        Customer:{' '}
-        <select value={customerId} onChange={e => setCustomerId(e.target.value)}>
-          {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
-      </label>
+      <div className="toolbar">
+        <label>
+          Customer
+          <select value={customerId} onChange={e => setCustomerId(e.target.value)}>
+            {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+        </label>
+      </div>
 
-      {error && <p role="alert" style={{ color: '#dc2626', marginTop: '12px' }}>⚠️ {error}</p>}
+      {error && <p role="alert" className="alert alert-error">⚠️ {error}</p>}
 
       {form && (
         <div className="tenant-form">
           <p data-testid="tenant-status">
-            Status: <strong>{tenant ? tenant.status : 'not created'}</strong>
+            Status:{' '}
+            <span className={`badge badge-${tenant ? tenant.status : ''}`}>{tenant ? tenant.status : 'not created'}</span>
           </p>
 
           <label>Display name
@@ -109,11 +112,11 @@ function TenantSetup() {
           </label>
 
           {locked ? (
-            <p>✅ Tenant provisioned{tenant.provisionedAt ? ` at ${tenant.provisionedAt}` : ''}</p>
+            <p className="alert alert-success">✅ Tenant provisioned{tenant.provisionedAt ? ` at ${new Date(tenant.provisionedAt).toLocaleString()}` : ''}</p>
           ) : (
             <div className="tenant-actions">
-              <button onClick={save} disabled={busy}>Save configuration</button>
-              <button onClick={provision} disabled={busy}>Provision tenant</button>
+              <button className="btn" onClick={save} disabled={busy}>Save configuration</button>
+              <button className="btn btn-primary" onClick={provision} disabled={busy}>Provision tenant</button>
             </div>
           )}
         </div>
