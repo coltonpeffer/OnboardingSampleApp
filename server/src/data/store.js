@@ -9,7 +9,8 @@ const { createCustomer, createTenant, createDefaultOnboardingSteps } = require('
 const store = {
   customers: [],
   tenants: [],
-  onboardingStates: []
+  onboardingStates: [],
+  clients: []
 };
 
 // Seed with example data
@@ -88,6 +89,21 @@ function updateTenant(customerId, updates) {
   return store.tenants[index];
 }
 
+function getClients(sourceId) {
+  return store.clients.filter(c => c.sourceId === sourceId);
+}
+
+// Insert or replace a client keyed by (sourceId, externalId)
+function upsertClient(client) {
+  const index = store.clients.findIndex(c => c.sourceId === client.sourceId && c.externalId === client.externalId);
+  if (index === -1) {
+    store.clients.push(client);
+    return { client, created: true };
+  }
+  store.clients[index] = client;
+  return { client, created: false };
+}
+
 function getOnboardingState(customerId) {
   return store.onboardingStates.find(s => s.customerId === customerId);
 }
@@ -117,6 +133,8 @@ module.exports = {
   getTenants,
   getTenantByCustomerId,
   addTenant,
+  getClients,
+  upsertClient,
   updateTenant,
   getOnboardingState,
   getAllOnboardingStates,

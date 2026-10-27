@@ -70,6 +70,9 @@ app.use('/api/tenants', require('./routes/tenants'));
 // Data mapping (Lane C)
 app.use('/api/mappings', require('./routes/mapping'));
 
+// Data import
+app.use('/api/import', require('./routes/import'));
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Onboarding API server running at http://localhost:${PORT}`);

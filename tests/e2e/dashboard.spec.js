@@ -64,4 +64,14 @@ test.describe('Onboarding Dashboard', () => {
     await expect(page.getByTestId('column-mapping')).toContainText('clientCode');
     await expect(page.getByTestId('mapping-summary')).toContainText('0 with issues');
   });
+
+  test('should import a customer\'s mapped clients', async ({ page }) => {
+    await page.goto('/');
+
+    await page.getByRole('button', { name: 'Import' }).click();
+    await page.getByRole('button', { name: 'Import clients' }).click();
+
+    await expect(page.getByTestId('import-summary')).toContainText('0 skipped');
+    await expect(page.getByTestId('imported-clients')).toContainText('Riverside Manufacturing LLC');
+  });
 });

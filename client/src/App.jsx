@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import TenantSetup from './tabs/TenantSetup';
+import Import from './tabs/Import';
 import DataMapping from './tabs/DataMapping';
 
 const TABS = [
@@ -70,7 +71,7 @@ function App() {
           <TenantSetup />
         )}
         {activeTab === 'import' && (
-          <PlaceholderTab title="Import" description="Import customer data into the platform" />
+          <Import />
         )}
       </main>
     </div>
