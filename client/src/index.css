@@ -169,3 +169,34 @@ header p {
   color: #6b7280;
   font-size: 0.9rem;
 }
+
+/* Data Mapping tab */
+.mapping-heading {
+  margin: 24px 0 8px;
+}
+
+.mapping-scroll {
+  overflow-x: auto;
+}
+
+.mapping-table {
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  width: 100%;
+}
+
+.mapping-table th,
+.mapping-table td {
+  border: 1px solid #e5e7eb;
+  padding: 6px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.mapping-table th {
+  background: #f9fafb;
+}
+
+.mapping-table tr.has-issues {
+  background: #fef2f2;
+}
