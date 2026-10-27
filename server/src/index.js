@@ -67,6 +67,8 @@ app.get('/api/tenants/:customerId', (req, res) => {
 
 // Tenant configuration + provisioning
 app.use('/api/tenants', require('./routes/tenants'));
+// Data mapping (Lane C)
+app.use('/api/mappings', require('./routes/mapping'));
 
 // Start server
 app.listen(PORT, () => {
