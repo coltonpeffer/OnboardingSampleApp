@@ -97,4 +97,42 @@ test.describe('Onboarding Dashboard', () => {
     await expect(page.getByTestId('validation-summary')).toContainText('12 with warnings');
     await expect(page.getByTestId('validation-rows')).toContainText('unquoted comma');
   });
+
+  test('should clear warnings and complete the Customer Info step', async ({ page }) => {
+    await page.goto('/');
+
+    await page.getByRole('button', { name: 'Customer Info' }).click();
+    await page.locator('select').selectOption({ label: 'XYZ Financial Services' });
+
+    // Warnings block completion until acknowledged
+    const complete = page.getByRole('button', { name: 'Clear warnings & complete step' });
+    await expect(complete).toBeDisabled();
+    await page.getByLabel(/reviewed the 12 row/).check();
+    await complete.click();
+    await expect(page.getByTestId('step-status')).toContainText('completed');
+
+    // Dashboard reflects the completed step
+    await page.getByRole('button', { name: 'Dashboard' }).click();
+    await page.locator('.customer-card', { hasText: 'XYZ Financial Services' }).click();
+    await expect(page.getByTestId('customer-detail')).toContainText('25%');
+  });
+
+  test('should complete Data Mapping only after Customer Info', async ({ page }) => {
+    await page.goto('/');
+
+    await page.getByRole('button', { name: 'Data Mapping' }).click();
+    await page.locator('select').selectOption({ label: 'ABC Accounting' });
+    await page.getByRole('button', { name: 'Mark step complete' }).click();
+    await expect(page.getByRole('alert')).toContainText('"Customer Info" step first');
+
+    await page.getByRole('button', { name: 'Customer Info' }).click();
+    await page.locator('select').selectOption({ label: 'ABC Accounting' });
+    await page.getByRole('button', { name: 'Mark step complete' }).click();
+    await expect(page.getByTestId('step-status')).toContainText('completed');
+
+    await page.getByRole('button', { name: 'Data Mapping' }).click();
+    await page.locator('select').selectOption({ label: 'ABC Accounting' });
+    await page.getByRole('button', { name: 'Mark step complete' }).click();
+    await expect(page.getByTestId('step-status')).toContainText('completed');
+  });
 });

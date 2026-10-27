@@ -1,28 +1,16 @@
 import React, { useState, useEffect } from 'react';
-
-async function request(url, options) {
-  const res = await fetch(url, options);
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
-  return body;
-}
+import { request, useSourceCustomers } from '../api';
+import StepPanel from '../StepPanel';
 
 function Import() {
-  const [sources, setSources] = useState([]);
-  const [sourceId, setSourceId] = useState('');
+  const { customers, customerId, setCustomerId, customer, error: loadError } = useSourceCustomers();
   const [clients, setClients] = useState([]);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  useEffect(() => {
-    request('/api/mappings')
-      .then(data => {
-        setSources(data.mappings);
-        setSourceId(data.mappings[0]?.id ?? '');
-      })
-      .catch(err => setError(err.message));
-  }, []);
+  const sourceId = customer?.sourceId;
 
   useEffect(() => {
     if (!sourceId) return;
@@ -38,6 +26,7 @@ function Import() {
     setError(null);
     try {
       setResult(await request(`/api/import/${sourceId}/clients`, { method: 'POST' }));
+      setRefreshKey(k => k + 1);
       setClients(await request(`/api/import/${sourceId}/clients`));
     } catch (err) {
       setError(err.message);
@@ -56,8 +45,8 @@ function Import() {
       <div className="toolbar">
         <label>
           Customer
-          <select value={sourceId} onChange={e => setSourceId(e.target.value)}>
-            {sources.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+          <select value={customerId} onChange={e => setCustomerId(e.target.value)}>
+            {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </label>
         <button className="btn btn-primary" onClick={runImport} disabled={busy || !sourceId}>
@@ -65,11 +54,16 @@ function Import() {
         </button>
       </div>
 
-      {error && <p role="alert" className="alert alert-error">⚠️ {error}</p>}
+      {(error || loadError) && <p role="alert" className="alert alert-error">⚠️ {error || loadError}</p>}
 
       {result && (
         <p data-testid="import-summary" className={`alert ${result.skipped.length ? 'alert-error' : 'alert-success'}`}>
           {result.imported} imported, {result.updated} updated, {result.skipped.length} skipped (of {result.total})
+        </p>
+      )}
+      {result?.step && !result.step.completed && (
+        <p data-testid="import-step-blocked" className="issue-warning" style={{ marginTop: '6px' }}>
+          Import step not completed: {result.step.reason}
         </p>
       )}
       {result?.skipped.map(s => (
@@ -93,6 +87,15 @@ function Import() {
             </tbody>
           </table>
         </div>
+      )}
+
+      {customerId && (
+        <StepPanel
+          customerId={customerId}
+          stepName="Import"
+          refreshKey={refreshKey}
+          hint="Completes automatically after a clean import, once Data Mapping is done and the tenant is active."
+        />
       )}
     </div>
   );

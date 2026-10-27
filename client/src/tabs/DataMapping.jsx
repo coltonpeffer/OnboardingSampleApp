@@ -1,55 +1,45 @@
 import React, { useState, useEffect } from 'react';
-
-async function getJson(url) {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
-}
+import { request, useSourceCustomers } from '../api';
+import StepPanel from '../StepPanel';
 
 function DataMapping() {
+  const { customers, customerId, setCustomerId, customer, error: loadError } = useSourceCustomers();
   const [config, setConfig] = useState(null);
-  const [selectedId, setSelectedId] = useState(null);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
+  const sourceId = customer?.sourceId;
+
   useEffect(() => {
-    getJson('/api/mappings')
-      .then(data => {
-        setConfig(data);
-        setSelectedId(data.mappings[0]?.id ?? null);
-      })
-      .catch(err => setError(err.message));
+    request('/api/mappings').then(setConfig).catch(err => setError(err.message));
   }, []);
 
   useEffect(() => {
-    if (!selectedId) return;
+    if (!sourceId) return;
     setResult(null);
-    getJson(`/api/mappings/${selectedId}/clients`)
+    request(`/api/mappings/${sourceId}/clients`)
       .then(data => { setResult(data); setError(null); })
       .catch(err => setError(err.message));
-  }, [selectedId]);
+  }, [sourceId]);
 
-  if (error) {
-    return (
-      <div className="alert alert-error" role="alert">⚠️ Failed to load data mapping: {error}</div>
-    );
+  if (error || loadError) {
+    return <div className="alert alert-error" role="alert">⚠️ Failed to load data mapping: {error || loadError}</div>;
   }
-  if (!config) return <div className="placeholder"><p>Loading...</p></div>;
+  if (!config || !customer) return <div className="placeholder"><p>Loading...</p></div>;
 
-  const mapping = config.mappings.find(m => m.id === selectedId);
+  const mapping = config.mappings.find(m => m.id === sourceId);
+  const issues = result?.summary.withIssues ?? 0;
 
   return (
     <div>
       <h2>Data Mapping · Clients</h2>
-      <p className="lead">
-        Map a customer's client data to the platform's Client schema.
-      </p>
+      <p className="lead">Map a customer's client data to the platform's Client schema.</p>
 
       <div className="toolbar">
         <label>
           Customer
-          <select value={selectedId ?? ''} onChange={e => setSelectedId(e.target.value)}>
-            {config.mappings.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+          <select value={customerId} onChange={e => setCustomerId(e.target.value)}>
+            {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </label>
         {mapping && <span className="badge">Dates: {mapping.dateFormat}</span>}
@@ -105,6 +95,13 @@ function DataMapping() {
               </tbody>
             </table>
           </div>
+
+          <StepPanel
+            customerId={customerId}
+            stepName="Data Mapping"
+            endpoint="data-mapping"
+            blockedReason={issues > 0 ? `${issues} client(s) cannot be mapped - fix the mapping before completing this step` : null}
+          />
         </>
       )}
     </div>

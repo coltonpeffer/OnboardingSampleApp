@@ -5,10 +5,10 @@
  */
 
 const store = require('../data/store');
-const { createTenant, calculateProgress } = require('../models');
+const { createTenant } = require('../models');
+const { STEPS, completeStep } = require('../steps/steps');
 
 const PLANS = ['starter', 'professional', 'enterprise'];
-const TENANT_STEP_NAME = 'Tenant Setup';
 
 class ProvisioningError extends Error {
   constructor(status, message) {
@@ -78,15 +78,8 @@ function provisionTenant(customerId) {
   if (errors.length) throw new ProvisioningError(400, errors.join('; '));
 
   const provisioned = store.updateTenant(customerId, { config, status: 'active', provisionedAt: new Date().toISOString() });
-  completeTenantStep(customerId);
+  if (store.getOnboardingState(customerId)) completeStep(customerId, STEPS.tenantSetup);
   return provisioned;
-}
-
-function completeTenantStep(customerId) {
-  const state = store.getOnboardingState(customerId);
-  if (!state) return;
-  const steps = state.steps.map(s => (s.name === TENANT_STEP_NAME ? { ...s, status: 'completed' } : s));
-  store.updateOnboardingState(customerId, { steps, progressPercent: calculateProgress(steps) });
 }
 
 module.exports = { PLANS, ProvisioningError, defaultConfig, configureTenant, provisionTenant };

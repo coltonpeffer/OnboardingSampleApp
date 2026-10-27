@@ -1,55 +1,44 @@
 import React, { useState, useEffect } from 'react';
-
-async function getJson(url) {
-  const res = await fetch(url);
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
-  return body;
-}
+import { request, useSourceCustomers } from '../api';
+import StepPanel from '../StepPanel';
 
 function CustomerInfo() {
-  const [sources, setSources] = useState([]);
-  const [sourceId, setSourceId] = useState('');
+  const { customers, customerId, setCustomerId, customer, error: loadError } = useSourceCustomers();
   const [validation, setValidation] = useState(null);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    getJson('/api/mappings')
-      .then(data => {
-        setSources(data.mappings);
-        setSourceId(data.mappings[0]?.id ?? '');
-      })
-      .catch(err => setError(err.message));
-  }, []);
+  const sourceId = customer?.sourceId;
 
   useEffect(() => {
     if (!sourceId) return;
     setValidation(null);
     setError(null);
-    getJson(`/api/customer-info/${sourceId}/clients/validation`)
+    request(`/api/customer-info/${sourceId}/clients/validation`)
       .then(setValidation)
       .catch(err => setError(err.message));
   }, [sourceId]);
 
   const s = validation?.summary;
+  const blockedReason = !validation ? null
+    : validation.missingColumns.length ? `Missing columns: ${validation.missingColumns.join(', ')}`
+    : s.withErrors ? `${s.withErrors} row(s) have errors - fix the source data before completing this step`
+    : null;
 
   return (
     <div>
       <h2>Customer Info · Clients</h2>
-      <p className="lead">
-        Validate the customer's clients file before mapping and import.
-      </p>
+      <p className="lead">Validate the customer's clients file before mapping and import.</p>
 
       <div className="toolbar">
         <label>
           Customer
-          <select value={sourceId} onChange={e => setSourceId(e.target.value)}>
-            {sources.map(src => <option key={src.id} value={src.id}>{src.name}</option>)}
+          <select value={customerId} onChange={e => setCustomerId(e.target.value)}>
+            {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </label>
       </div>
 
-      {error && <p role="alert" className="alert alert-error">⚠️ {error}</p>}
+      {(error || loadError) && <p role="alert" className="alert alert-error">⚠️ {error || loadError}</p>}
       {!validation && !error && <p>Loading...</p>}
 
       {validation && (
@@ -92,6 +81,14 @@ function CustomerInfo() {
               </tbody>
             </table>
           </div>
+
+          <StepPanel
+            customerId={customerId}
+            stepName="Customer Info"
+            endpoint="customer-info"
+            warnings={s.withWarnings}
+            blockedReason={blockedReason}
+          />
         </>
       )}
     </div>

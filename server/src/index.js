@@ -78,6 +78,9 @@ app.use('/api/import', require('./routes/import'));
 // Customer info validation (Lane B)
 app.use('/api/customer-info', require('./routes/customerInfo'));
 
+// Step completion (validators gate each onboarding step)
+app.use('/api/customers', require('./routes/steps'));
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Onboarding API server running at http://localhost:${PORT}`);

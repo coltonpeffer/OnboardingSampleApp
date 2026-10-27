@@ -522,3 +522,33 @@ button.customer-card .progress-bar {
 @media (max-width: 800px) {
   .queue-layout { grid-template-columns: 1fr; }
 }
+
+/* Step completion panel */
+.step-panel {
+  margin-top: 24px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.step-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.step-panel .alert {
+  margin-top: 0;
+}
+
+.ack {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
