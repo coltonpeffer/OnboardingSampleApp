@@ -32,6 +32,12 @@ function seedData() {
     plan: 'professional',
     createdAt: '2025-01-15T10:00:00Z'
   });
+  exampleTenant.config = {
+    plan: 'professional',
+    displayName: 'Acme Corporation',
+    region: 'North America',
+    adminEmail: 'onboarding@acme.example.com'
+  };
 
   // Example onboarding state - just started, nothing completed
   const exampleOnboardingState = {
@@ -75,6 +81,13 @@ function addTenant(tenant) {
   return tenant;
 }
 
+function updateTenant(customerId, updates) {
+  const index = store.tenants.findIndex(t => t.customerId === customerId);
+  if (index === -1) return null;
+  store.tenants[index] = { ...store.tenants[index], ...updates };
+  return store.tenants[index];
+}
+
 function getOnboardingState(customerId) {
   return store.onboardingStates.find(s => s.customerId === customerId);
 }
@@ -104,6 +117,7 @@ module.exports = {
   getTenants,
   getTenantByCustomerId,
   addTenant,
+  updateTenant,
   getOnboardingState,
   getAllOnboardingStates,
   addOnboardingState,

@@ -38,4 +38,15 @@ test.describe('Onboarding Dashboard', () => {
     // Verify placeholder content is shown
     await expect(page.locator('.placeholder h2')).toContainText('Customer Info');
   });
+
+  test('should configure and provision the customer tenant', async ({ page }) => {
+    await page.goto('/');
+
+    await page.getByRole('button', { name: 'Tenant Setup' }).click();
+    await expect(page.getByTestId('tenant-status')).toContainText('pending');
+
+    await page.getByRole('button', { name: 'Provision tenant' }).click();
+    await expect(page.getByTestId('tenant-status')).toContainText('active');
+    await expect(page.getByText('Tenant provisioned')).toBeVisible();
+  });
 });

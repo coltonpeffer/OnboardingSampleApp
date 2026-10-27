@@ -65,6 +65,9 @@ app.get('/api/tenants/:customerId', (req, res) => {
   res.json(tenant);
 });
 
+// Tenant configuration + provisioning
+app.use('/api/tenants', require('./routes/tenants'));
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Onboarding API server running at http://localhost:${PORT}`);

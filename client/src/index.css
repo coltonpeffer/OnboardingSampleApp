@@ -169,3 +169,24 @@ header p {
   color: #6b7280;
   font-size: 0.9rem;
 }
+
+/* Tenant Setup tab */
+.tenant-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+  max-width: 420px;
+}
+
+.tenant-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.tenant-actions {
+  display: flex;
+  gap: 8px;
+}
