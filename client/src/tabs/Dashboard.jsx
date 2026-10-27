@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useCustomer } from '../CustomerContext';
 
 async function getJson(url) {
   const res = await fetch(url);
@@ -8,7 +9,7 @@ async function getJson(url) {
 
 function Dashboard() {
   const [customers, setCustomers] = useState([]);
-  const [selectedId, setSelectedId] = useState(null);
+  const { customerId: selectedId, setCustomerId: setSelectedId } = useCustomer();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -17,7 +18,6 @@ function Dashboard() {
       .then(data => {
         if (!Array.isArray(data)) throw new Error('Invalid response format');
         setCustomers(data);
-        setSelectedId(data[0]?.customerId ?? null);
         setError(null);
       })
       .catch(err => {

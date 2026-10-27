@@ -552,3 +552,14 @@ button.customer-card .progress-bar {
   gap: 8px;
   font-size: 0.9rem;
 }
+
+/* One customer at a time */
+.customer-bar {
+  margin-bottom: 16px;
+  background: var(--primary-soft);
+  border: 1px solid #bfdbfe;
+}
+
+.customer-bar select {
+  font-weight: 600;
+}

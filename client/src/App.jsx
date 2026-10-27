@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Dashboard from './tabs/Dashboard';
+import { CustomerProvider, useCustomer } from './CustomerContext';
 import CustomerInfo from './tabs/CustomerInfo';
 import TenantSetup from './tabs/TenantSetup';
 import Import from './tabs/Import';
@@ -13,6 +14,22 @@ const TABS = [
   { id: 'import', label: 'Import' }
 ];
 
+function CustomerBar() {
+  const { customers, customerId, setCustomerId, error } = useCustomer();
+  return (
+    <div className="toolbar customer-bar">
+      <label>
+        Working on
+        <select data-testid="customer-select" value={customerId} onChange={e => setCustomerId(e.target.value)}>
+          {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+        </select>
+      </label>
+      <span className="muted">One customer at a time - every tab follows this selection.</span>
+      {error && <span role="alert" className="issue-error">⚠️ {error}</span>}
+    </div>
+  );
+}
+
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   return (
@@ -21,6 +38,8 @@ function App() {
         <h1>Onboarding Dashboard</h1>
         <p>Customer Success Team - Internal Tool</p>
       </header>
+
+      <CustomerBar />
 
       <nav className="tabs">
         {TABS.map(tab => (
@@ -65,4 +84,12 @@ function PlaceholderTab({ title, description }) {
   );
 }
 
-export default App;
+function AppWithCustomer() {
+  return (
+    <CustomerProvider>
+      <App />
+    </CustomerProvider>
+  );
+}
+
+export default AppWithCustomer;

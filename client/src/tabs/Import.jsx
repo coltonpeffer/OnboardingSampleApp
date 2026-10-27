@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { request, useSourceCustomers } from '../api';
+import { request } from '../api';
+import { useCustomer, NoSourceData } from '../CustomerContext';
 import StepPanel from '../StepPanel';
 
 function Import() {
-  const { customers, customerId, setCustomerId, customer, error: loadError } = useSourceCustomers();
+  const { customer } = useCustomer();
+  const customerId = customer?.id;
   const [clients, setClients] = useState([]);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
@@ -35,6 +37,9 @@ function Import() {
     }
   };
 
+  if (!customer) return <div className="placeholder"><p>Loading...</p></div>;
+  if (!sourceId) return <NoSourceData customer={customer} />;
+
   return (
     <div>
       <h2>Import · Clients</h2>
@@ -43,18 +48,12 @@ function Import() {
       </p>
 
       <div className="toolbar">
-        <label>
-          Customer
-          <select value={customerId} onChange={e => setCustomerId(e.target.value)}>
-            {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-        </label>
         <button className="btn btn-primary" onClick={runImport} disabled={busy || !sourceId}>
           {busy ? 'Importing…' : 'Import clients'}
         </button>
       </div>
 
-      {(error || loadError) && <p role="alert" className="alert alert-error">⚠️ {error || loadError}</p>}
+      {error && <p role="alert" className="alert alert-error">⚠️ {error}</p>}
 
       {result && (
         <p data-testid="import-summary" className={`alert ${result.skipped.length ? 'alert-error' : 'alert-success'}`}>

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { request, useSourceCustomers } from '../api';
+import { request } from '../api';
+import { useCustomer, NoSourceData } from '../CustomerContext';
 import StepPanel from '../StepPanel';
 
 function CustomerInfo() {
-  const { customers, customerId, setCustomerId, customer, error: loadError } = useSourceCustomers();
+  const { customer } = useCustomer();
+  const customerId = customer?.id;
   const [validation, setValidation] = useState(null);
   const [error, setError] = useState(null);
 
@@ -24,21 +26,15 @@ function CustomerInfo() {
     : s.withErrors ? `${s.withErrors} row(s) have errors - fix the source data before completing this step`
     : null;
 
+  if (!customer) return <div className="placeholder"><p>Loading...</p></div>;
+  if (!sourceId) return <NoSourceData customer={customer} />;
+
   return (
     <div>
       <h2>Customer Info · Clients</h2>
       <p className="lead">Validate the customer's clients file before mapping and import.</p>
 
-      <div className="toolbar">
-        <label>
-          Customer
-          <select value={customerId} onChange={e => setCustomerId(e.target.value)}>
-            {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-        </label>
-      </div>
-
-      {(error || loadError) && <p role="alert" className="alert alert-error">⚠️ {error || loadError}</p>}
+      {error && <p role="alert" className="alert alert-error">⚠️ {error}</p>}
       {!validation && !error && <p>Loading...</p>}
 
       {validation && (

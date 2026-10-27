@@ -44,11 +44,11 @@ test.describe('Onboarding Dashboard', () => {
   test('should switch between tabs', async ({ page }) => {
     await page.goto('/');
 
-    // Click on Customer Info tab
-    await page.getByRole('button', { name: 'Customer Info' }).click();
-    
-    // Verify the Customer Info tab content is shown
-    await expect(page.locator('h2')).toContainText('Customer Info');
+    // Click on Tenant Setup tab
+    await page.getByRole('button', { name: 'Tenant Setup' }).click();
+
+    // Verify the Tenant Setup tab content is shown
+    await expect(page.locator('h2')).toContainText('Tenant Setup');
   });
 
   test('should configure and provision the customer tenant', async ({ page }) => {
@@ -65,6 +65,7 @@ test.describe('Onboarding Dashboard', () => {
   test('should map customer client data to the platform schema', async ({ page }) => {
     await page.goto('/');
 
+    await page.getByTestId('customer-select').selectOption({ label: 'ABC Accounting' });
     await page.getByRole('button', { name: 'Data Mapping' }).click();
 
     // Customer A: 10 clients mapped, MM/DD/YYYY normalised to ISO
@@ -72,7 +73,7 @@ test.describe('Onboarding Dashboard', () => {
     await expect(page.getByTestId('mapping-preview')).toContainText('2023-01-15');
 
     // Customer B uses different columns and picklist codes
-    await page.locator('select').selectOption({ label: 'XYZ Financial Services' });
+    await page.getByTestId('customer-select').selectOption({ label: 'XYZ Financial Services' });
     await expect(page.getByTestId('column-mapping')).toContainText('clientCode');
     await expect(page.getByTestId('mapping-summary')).toContainText('0 with issues');
   });
@@ -80,6 +81,7 @@ test.describe('Onboarding Dashboard', () => {
   test('should import a customer\'s mapped clients', async ({ page }) => {
     await page.goto('/');
 
+    await page.getByTestId('customer-select').selectOption({ label: 'ABC Accounting' });
     await page.getByRole('button', { name: 'Import' }).click();
     await page.getByRole('button', { name: 'Import clients' }).click();
 
@@ -90,10 +92,11 @@ test.describe('Onboarding Dashboard', () => {
   test('should validate customer data and flag the XYZ unquoted-comma rows', async ({ page }) => {
     await page.goto('/');
 
+    await page.getByTestId('customer-select').selectOption({ label: 'ABC Accounting' });
     await page.getByRole('button', { name: 'Customer Info' }).click();
     await expect(page.getByTestId('validation-summary')).toContainText('0 with errors');
 
-    await page.locator('select').selectOption({ label: 'XYZ Financial Services' });
+    await page.getByTestId('customer-select').selectOption({ label: 'XYZ Financial Services' });
     await expect(page.getByTestId('validation-summary')).toContainText('12 with warnings');
     await expect(page.getByTestId('validation-rows')).toContainText('unquoted comma');
   });
@@ -102,7 +105,7 @@ test.describe('Onboarding Dashboard', () => {
     await page.goto('/');
 
     await page.getByRole('button', { name: 'Customer Info' }).click();
-    await page.locator('select').selectOption({ label: 'XYZ Financial Services' });
+    await page.getByTestId('customer-select').selectOption({ label: 'XYZ Financial Services' });
 
     // Warnings block completion until acknowledged
     const complete = page.getByRole('button', { name: 'Clear warnings & complete step' });
@@ -121,18 +124,44 @@ test.describe('Onboarding Dashboard', () => {
     await page.goto('/');
 
     await page.getByRole('button', { name: 'Data Mapping' }).click();
-    await page.locator('select').selectOption({ label: 'ABC Accounting' });
+    await page.getByTestId('customer-select').selectOption({ label: 'ABC Accounting' });
     await page.getByRole('button', { name: 'Mark step complete' }).click();
     await expect(page.getByRole('alert')).toContainText('"Customer Info" step first');
 
     await page.getByRole('button', { name: 'Customer Info' }).click();
-    await page.locator('select').selectOption({ label: 'ABC Accounting' });
+    await page.getByTestId('customer-select').selectOption({ label: 'ABC Accounting' });
     await page.getByRole('button', { name: 'Mark step complete' }).click();
     await expect(page.getByTestId('step-status')).toContainText('completed');
 
     await page.getByRole('button', { name: 'Data Mapping' }).click();
-    await page.locator('select').selectOption({ label: 'ABC Accounting' });
+    await page.getByTestId('customer-select').selectOption({ label: 'ABC Accounting' });
     await page.getByRole('button', { name: 'Mark step complete' }).click();
     await expect(page.getByTestId('step-status')).toContainText('completed');
+  });
+
+  test('should work on one customer at a time across every tab', async ({ page }) => {
+    await page.goto('/');
+
+    // Pick the customer once, in the dashboard
+    await page.locator('.customer-card', { hasText: 'XYZ Financial Services' }).click();
+    await expect(page.getByTestId('customer-select')).toHaveValue(/cust_003/);
+
+    // Every tab follows that selection
+    await page.getByRole('button', { name: 'Customer Info' }).click();
+    await expect(page.getByTestId('validation-summary')).toContainText('12 with warnings');
+    await page.getByRole('button', { name: 'Tenant Setup' }).click();
+    await expect(page.locator('input').first()).toHaveValue('XYZ Financial Services');
+
+    // Switching customer switches every tab
+    await page.getByTestId('customer-select').selectOption({ label: 'Premier Bookkeeping' });
+    await page.getByRole('button', { name: 'Data Mapping' }).click();
+    await expect(page.getByTestId('column-mapping')).toContainText('customer_id');
+  });
+
+  test('should explain when a customer has no source data', async ({ page }) => {
+    await page.goto('/');
+
+    await page.getByRole('button', { name: 'Customer Info' }).click();
+    await expect(page.locator('.placeholder')).toContainText('Acme Corporation has no customer files');
   });
 });

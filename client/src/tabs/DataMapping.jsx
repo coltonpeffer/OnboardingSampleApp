@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { request, useSourceCustomers } from '../api';
+import { request } from '../api';
+import { useCustomer, NoSourceData } from '../CustomerContext';
 import StepPanel from '../StepPanel';
 
 function DataMapping() {
-  const { customers, customerId, setCustomerId, customer, error: loadError } = useSourceCustomers();
+  const { customer } = useCustomer();
+  const customerId = customer?.id;
   const [config, setConfig] = useState(null);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
@@ -22,9 +24,10 @@ function DataMapping() {
       .catch(err => setError(err.message));
   }, [sourceId]);
 
-  if (error || loadError) {
-    return <div className="alert alert-error" role="alert">⚠️ Failed to load data mapping: {error || loadError}</div>;
+  if (error) {
+    return <div className="alert alert-error" role="alert">⚠️ Failed to load data mapping: {error}</div>;
   }
+  if (customer && !sourceId) return <NoSourceData customer={customer} />;
   if (!config || !customer) return <div className="placeholder"><p>Loading...</p></div>;
 
   const mapping = config.mappings.find(m => m.id === sourceId);
@@ -35,15 +38,11 @@ function DataMapping() {
       <h2>Data Mapping · Clients</h2>
       <p className="lead">Map a customer's client data to the platform's Client schema.</p>
 
-      <div className="toolbar">
-        <label>
-          Customer
-          <select value={customerId} onChange={e => setCustomerId(e.target.value)}>
-            {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-        </label>
-        {mapping && <span className="badge">Dates: {mapping.dateFormat}</span>}
-      </div>
+      {mapping && (
+        <div className="toolbar">
+          <span className="badge">Dates: {mapping.dateFormat}</span>
+        </div>
+      )}
 
       {mapping && (
         <>

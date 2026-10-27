@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useCustomer } from '../CustomerContext';
 
 async function request(url, options) {
   const res = await fetch(url, options);
@@ -14,22 +15,13 @@ const json = (method, body) => ({
 });
 
 function TenantSetup() {
-  const [customers, setCustomers] = useState([]);
-  const [customerId, setCustomerId] = useState('');
+  const { customer } = useCustomer();
+  const customerId = customer?.id;
   const [tenant, setTenant] = useState(null);
   const [plans, setPlans] = useState([]);
   const [form, setForm] = useState(null);
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    request('/api/customers')
-      .then(data => {
-        setCustomers(data);
-        setCustomerId(data[0]?.id ?? '');
-      })
-      .catch(err => setError(err.message));
-  }, []);
 
   useEffect(() => {
     if (!customerId) return;
@@ -77,15 +69,6 @@ function TenantSetup() {
       <p className="lead">
         Configure and provision the customer's platform tenant.
       </p>
-
-      <div className="toolbar">
-        <label>
-          Customer
-          <select value={customerId} onChange={e => setCustomerId(e.target.value)}>
-            {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-        </label>
-      </div>
 
       {error && <p role="alert" className="alert alert-error">⚠️ {error}</p>}
 
