@@ -10,6 +10,7 @@ const customerMappings = [
     name: 'ABC Accounting',
     folder: 'CustomerA_ABCAccounting',
     dateFormat: 'MM/DD/YYYY',
+    taxIdPattern: /^\d{2}-\d{7}$/,
     columns: {
       externalId: 'Client ID', name: 'Client Name', entityType: 'Business Type', status: 'Status',
       startDate: 'Date Onboarded', taxId: 'Tax ID', annualRevenue: 'Annual Revenue',
@@ -28,6 +29,7 @@ const customerMappings = [
     name: 'XYZ Financial Services',
     folder: 'CustomerB_XYZFinancialServices',
     dateFormat: 'YYYY-MM-DD',
+    taxIdPattern: /^\d{2}-\d{7}$/,
     columns: {
       externalId: 'clientCode', name: 'companyName', entityType: 'entityType', status: 'clientStatus',
       startDate: 'startDate', taxId: 'federalTaxId', annualRevenue: 'yearlyRevenue',
@@ -51,6 +53,7 @@ const customerMappings = [
     name: 'Premier Bookkeeping',
     folder: 'CustomerC_PremierBookkeeping',
     dateFormat: 'DD-MM-YYYY',
+    taxIdPattern: /^GB\d{9}$/,
     columns: {
       externalId: 'customer_id', name: 'business_name', entityType: 'legal_structure', status: 'account_status',
       startDate: 'registration_date', taxId: 'tax_reference', annualRevenue: 'gross_revenue',

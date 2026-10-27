@@ -36,4 +36,4 @@ function parseCsv(text) {
   });
 }
 
-module.exports = { parseCsv };
+module.exports = { parseCsv, splitLine };

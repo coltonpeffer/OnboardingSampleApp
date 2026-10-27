@@ -35,8 +35,8 @@ test.describe('Onboarding Dashboard', () => {
     // Click on Customer Info tab
     await page.getByRole('button', { name: 'Customer Info' }).click();
     
-    // Verify placeholder content is shown
-    await expect(page.locator('.placeholder h2')).toContainText('Customer Info');
+    // Verify the Customer Info tab content is shown
+    await expect(page.locator('h2')).toContainText('Customer Info');
   });
 
   test('should configure and provision the customer tenant', async ({ page }) => {
@@ -73,5 +73,16 @@ test.describe('Onboarding Dashboard', () => {
 
     await expect(page.getByTestId('import-summary')).toContainText('0 skipped');
     await expect(page.getByTestId('imported-clients')).toContainText('Riverside Manufacturing LLC');
+  });
+
+  test('should validate customer data and flag the XYZ unquoted-comma rows', async ({ page }) => {
+    await page.goto('/');
+
+    await page.getByRole('button', { name: 'Customer Info' }).click();
+    await expect(page.getByTestId('validation-summary')).toContainText('0 with errors');
+
+    await page.locator('select').selectOption({ label: 'XYZ Financial Services' });
+    await expect(page.getByTestId('validation-summary')).toContainText('12 with warnings');
+    await expect(page.getByTestId('validation-rows')).toContainText('unquoted comma');
   });
 });

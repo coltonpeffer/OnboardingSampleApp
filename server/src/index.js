@@ -73,6 +73,9 @@ app.use('/api/mappings', require('./routes/mapping'));
 // Data import
 app.use('/api/import', require('./routes/import'));
 
+// Customer info validation (Lane B)
+app.use('/api/customer-info', require('./routes/customerInfo'));
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Onboarding API server running at http://localhost:${PORT}`);

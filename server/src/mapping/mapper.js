@@ -84,4 +84,4 @@ function mapClients(mapping, dataDir = SAMPLE_DATA_DIR) {
   };
 }
 
-module.exports = { listMappings, getMapping, mapClients, mapClientRow, parseDate, parsePaymentTermsDays };
+module.exports = { SAMPLE_DATA_DIR, listMappings, getMapping, mapClients, mapClientRow, parseDate, parsePaymentTermsDays };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import CustomerInfo from './tabs/CustomerInfo';
 import TenantSetup from './tabs/TenantSetup';
 import Import from './tabs/Import';
 import DataMapping from './tabs/DataMapping';
@@ -62,7 +63,7 @@ function App() {
           <DashboardTab data={onboardingData} loading={loading} error={error} />
         )}
         {activeTab === 'customer-info' && (
-          <PlaceholderTab title="Customer Info" description="Collect and validate customer information" />
+          <CustomerInfo />
         )}
         {activeTab === 'data-mapping' && (
           <DataMapping />
